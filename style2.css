@@ -1,14 +1,16 @@
-/* style3.css - 水藍色系配色 */
+/* style3.css - 水藍色主調 + 彩虹漸層支援與動畫 */
 
-/* 水藍色系配色變數 */
+/* 主題變數 */
 :root {
     --primary-blue: #4dd0e1;
     --secondary-blue: #b2ebf2;
     --light-blue: #e0f7fa;
     --deep-blue: #007c91;
     --gradient-blue: linear-gradient(135deg, #4dd0e1 0%, #26c6da 50%, #00acc1 100%);
+    --gradient-rainbow: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
 }
 
+/* 基本重置 */
 * {
     margin: 0;
     padding: 0;
@@ -22,35 +24,61 @@ body {
     background: var(--light-blue);
 }
 
-/* Navigation */
-.navbar {
-    background: rgba(77, 208, 225, 0.95) !important;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 20px rgba(77, 208, 225, 0.3);
-    transition: all 0.3s ease;
+/* 彩虹效果：靜態 */
+.rainbow-text {
+    background: var(--gradient-rainbow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.navbar-brand {
+.rainbow-btn {
+    background: var(--gradient-rainbow);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
     font-weight: bold;
-    font-size: 1.5rem;
-    color: white !important;
-}
-
-.navbar-nav .nav-link {
-    color: white !important;
-    font-weight: 500;
-    margin: 0 10px;
+    cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-nav .nav-link:hover {
-    color: var(--secondary-blue) !important;
-    transform: translateY(-2px);
+.rainbow-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Hero Section */
+.rainbow-bg {
+    background: var(--gradient-rainbow);
+    color: white;
+}
+
+/* 彩虹動畫背景 */
+.animated-rainbow {
+    background: linear-gradient(
+        270deg,
+        red,
+        orange,
+        yellow,
+        green,
+        cyan,
+        blue,
+        violet
+    );
+    background-size: 1400% 1400%;
+    animation: rainbowFlow 10s ease infinite;
+    color: white;
+}
+
+@keyframes rainbowFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Hero 區塊 */
 .hero {
-    background: var(--gradient-blue);
+    background: var(--gradient-blue); /* 可改為 var(--gradient-rainbow) 或 .animated-rainbow */
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -93,21 +121,33 @@ body {
     opacity: 0.9;
 }
 
-.profile-img {
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 6px solid white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    transition: transform 0.3s ease;
+/* Navbar */
+.navbar {
+    background: rgba(77, 208, 225, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(77, 208, 225, 0.3);
+    transition: all 0.3s ease;
 }
 
-.profile-img:hover {
-    transform: scale(1.05);
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: white !important;
 }
 
-/* Sections */
+.navbar-nav .nav-link {
+    color: white !important;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--secondary-blue) !important;
+    transform: translateY(-2px);
+}
+
+/* 卡片 / 區塊樣式 */
 .section {
     padding: 80px 0;
 }
@@ -120,17 +160,12 @@ body {
     font-weight: bold;
 }
 
-.bg-light {
-    background: var(--secondary-blue) !important;
-}
-
-/* Cards */
 .card {
     border: none;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(77, 208, 225, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
     background: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
@@ -138,131 +173,7 @@ body {
     box-shadow: 0 20px 40px rgba(77, 208, 225, 0.3);
 }
 
-/* Filter Buttons */
-.filter-buttons {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.filter-btn {
-    background: white;
-    color: var(--primary-blue);
-    border: 2px solid var(--primary-blue);
-    padding: 10px 25px;
-    margin: 5px;
-    border-radius: 25px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-    background: var(--primary-blue);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(77, 208, 225, 0.4);
-}
-
-/* Project Grid */
-.project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.project-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(77, 208, 225, 0.15);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.project-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: var(--gradient-blue);
-}
-
-.project-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(77, 208, 225, 0.25);
-}
-
-.project-number {
-    background: var(--gradient-blue);
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-.project-card h5 {
-    color: var(--deep-blue);
-    margin-bottom: 1rem;
-    font-weight: bold;
-}
-
-/* Contact Section */
-.contact-info {
-    background: white;
-    padding: 3rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(77, 208, 225, 0.2);
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: var(--light-blue);
-    border-radius: 10px;
-    transition: transform 0.3s ease;
-}
-
-.contact-item:hover {
-    transform: translateX(10px);
-}
-
-.contact-item i {
-    font-size: 2rem;
-    color: var(--primary-blue);
-    margin-right: 1rem;
-    width: 50px;
-}
-
-.contact-item a {
-    color: var(--deep-blue) !important;
-    text-decoration: none;
-}
-
-.contact-item a:hover {
-    color: var(--primary-blue) !important;
-}
-
-/* Footer */
-.footer {
-    background: var(--deep-blue);
-    color: white;
-    text-align: center;
-    padding: 2rem 0;
-}
-
-/* Animations */
+/* 動畫淡入效果 */
 .fade-in {
     opacity: 0;
     transform: translateY(30px);
@@ -274,36 +185,19 @@ body {
     transform: translateY(0);
 }
 
-/* Responsive Design */
+/* 響應式設計 */
 @media (max-width: 768px) {
     .hero h1 {
         font-size: 2.5rem;
     }
-    
-    .profile-img {
-        width: 250px;
-        height: 250px;
-    }
-    
-    .project-grid {
-        grid-template-columns: 1fr;
-    }
-    
+
     .section-title {
         font-size: 2rem;
     }
-    
-    .filter-btn {
-        padding: 8px 20px;
-        font-size: 0.9rem;
-    }
-    
-    .project-card {
-        padding: 1.5rem;
-    }
-    
-    .contact-info {
-        padding: 2rem;
+
+    .rainbow-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
     }
 }
 
@@ -311,35 +205,17 @@ body {
     .hero h1 {
         font-size: 2rem;
     }
-    
+
     .hero .subtitle {
         font-size: 1.1rem;
     }
-    
+
     .section {
         padding: 60px 0;
     }
-    
-    .profile-img {
-        width: 200px;
-        height: 200px;
-    }
-    
-    .project-card {
-        padding: 1.2rem;
-    }
-    
-    .contact-info {
-        padding: 1.5rem;
-    }
-    
-    .contact-item {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .contact-item i {
-        margin-right: 0;
-        margin-bottom: 0.5rem;
+
+    .rainbow-btn {
+        padding: 8px 18px;
+        font-size: 0.9rem;
     }
 }
