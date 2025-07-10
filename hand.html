@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梵谷風格手勢辨識</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Libre Baskerville', serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #f7b733 50%, #fc4a1a 75%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 梵谷風格旋轉背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 100, 200, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 100, 100, 0.2) 0%, transparent 50%);
+            animation: swirl 20s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes swirl {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 248, 220, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.5),
+                inset 0 0 20px rgba(255, 215, 0, 0.2);
+            border: 3px solid #DAA520;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #FFD700, #FF8C00, #FF4500, #FF1493, #9932CC, #4169E1);
+            z-index: -1;
+            border-radius: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #8B4513;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 
+                3px 3px 0px #FFD700,
+                -1px -1px 0px #FF8C00,
+                1px -1px 0px #FF4500,
+                -1px 1px 0px #FF6347;
+            font-weight: 700;
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+
+        .artist-quote {
+            text-align: center;
+            font-style: italic;
+            color: #8B4513;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-family: 'Libre Baskerville', serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #32CD32, #228B22);
+            color: white;
+            box-shadow: 
+                0 5px 15px rgba(50, 205, 50, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .stop-btn {
+            background: linear-gradient(45deg, #DC143C, #8B0000);
+            color: white;
+            box-shadow: 
+                0 5px 15px rgba(220, 20, 60, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #webcam-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        #webcam-container canvas {
+            width: 320px !important;
+            height: 320px !important;
+            border: 8px solid #DAA520;
+            border-radius: 20px;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.6),
+                inset 0 0 20px rgba(255, 215, 0, 0.3);
+            filter: saturate(1.2) contrast(1.1);
+        }
+
+        .predictions {
+            margin-top: 30px;
+            background: rgba(255, 248, 220, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #DAA520;
+        }
+
+        .predictions h3 {
+            text-align: center;
+            color: #8B4513;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-style: italic;
+        }
+
+        .prediction-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .prediction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .prediction-label {
+            width: 140px;
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 16px;
+        }
+
+        .prediction-bar {
+            flex: 1;
+            height: 25px;
+            background: linear-gradient(45deg, #F5DEB3, #DEB887);
+            border-radius: 15px;
+            margin: 0 15px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #DAA520;
+        }
+
+        .prediction-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 13px;
+            position: relative;
+        }
+
+        .prediction-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.3) 25%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255,255,255,0.3) 75%);
+            background-size: 10px 10px;
+            animation: paint-stroke 2s linear infinite;
+        }
+
+        @keyframes paint-stroke {
+            0% { background-position: 0 0; }
+            100% { background-position: 10px 10px; }
+        }
+
+        .fill-first { 
+            background: linear-gradient(45deg, #FF4500, #FF6347, #FF8C00);
+            border: 2px solid #8B4513;
+        }
+        
+        .fill-second { 
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+            border: 2px solid #8B4513;
+        }
+        
+        .fill-other { 
+            background: linear-gradient(45deg, #4169E1, #6495ED, #87CEEB);
+            border: 2px solid #8B4513;
+        }
+
+        .prediction-value {
+            width: 70px;
+            text-align: right;
+            font-weight: bold;
+            color: #8B4513;
+            font-size: 16px;
+        }
+
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.3));
+            border-radius: 10px;
+            color: #8B4513;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid #DAA520;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .van-gogh-signature {
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-style: italic;
+            color: #8B4513;
+            opacity: 0.6;
+            font-size: 14px;
+        }
+
+        /* 星夜效果 */
+        .star {
+            position: absolute;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .star1 { top: 20px; left: 10%; width: 4px; height: 4px; animation-delay: 0s; }
+        .star2 { top: 60px; right: 15%; width: 3px; height: 3px; animation-delay: 1s; }
+        .star3 { top: 100px; left: 80%; width: 5px; height: 5px; animation-delay: 2s; }
+        .star4 { top: 150px; right: 30%; width: 3px; height: 3px; animation-delay: 0.5s; }
+        .star5 { top: 200px; left: 20%; width: 4px; height: 4px; animation-delay: 1.5s; }
+    </style>
+</head>
+<body>
+    <div class="star star1"></div>
+    <div class="star star2"></div>
+    <div class="star star3"></div>
+    <div class="star star4"></div>
+    <div class="star star5"></div>
+
+    <div class="container">
+        <h1>梵谷風格手勢辨識</h1>
+        <div class="artist-quote">"我夢想著繪畫，我畫著我的夢想"</div>
+        
+        <div class="controls">
+            <button id="startBtn" class="start-btn" onclick="init()">🎨 開始創作</button>
+            <button id="stopBtn" class="stop-btn" onclick="stopCamera()" disabled>🖌️ 停止創作</button>
+        </div>
+
+        <div class="status" id="status">準備好開始藝術創作了嗎？</div>
+
+        <div id="webcam-container"></div>
+        
+        <div id="label-container" class="predictions" style="display: none;">
+            <h3>🎭 藝術辨識結果</h3>
+        </div>
+
+        <div class="van-gogh-signature">~ 致敬梵谷 ~</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        const URL = "https://teachablemachine.withgoogle.com/models/ptgkq_k3Y/";
+        let model, webcam, labelContainer, maxPredictions;
+        let isRunning = false;
+
+        async function init() {
+            try {
+                document.getElementById("status").textContent = "正在調色盤...";
+                
+                // 載入模型
+                const modelURL = URL + "model.json";
+                const metadataURL = URL + "metadata.json";
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+
+                document.getElementById("status").textContent = "準備畫筆...";
+                
+                // 設置攝影機
+                const flip = true;
+                webcam = new tmImage.Webcam(320, 320, flip);
+                await webcam.setup();
+                await webcam.play();
+                
+                // 添加到頁面
+                const webcamContainer = document.getElementById("webcam-container");
+                webcamContainer.innerHTML = "";
+                webcamContainer.appendChild(webcam.canvas);
+
+                // 設置預測顯示
+                labelContainer = document.getElementById("label-container");
+                labelContainer.style.display = "block";
+                const predictionsDiv = labelContainer.querySelector('h3').nextElementSibling || labelContainer;
+                
+                // 清空並重新創建預測項目
+                while (labelContainer.children.length > 1) {
+                    labelContainer.removeChild(labelContainer.lastChild);
+                }
+                
+                for (let i = 0; i < maxPredictions; i++) {
+                    const div = document.createElement("div");
+                    div.className = "prediction-item";
+                    div.innerHTML = `
+                        <div class="prediction-label">筆觸 ${i + 1}</div>
+                        <div class="prediction-bar">
+                            <div class="prediction-fill fill-other" style="width: 0%"></div>
+                        </div>
+                        <div class="prediction-value">0%</div>
+                    `;
+                    labelContainer.appendChild(div);
+                }
+
+                // 開始預測
+                isRunning = true;
+                loop();
+                
+                // 更新按鈕狀態
+                document.getElementById("startBtn").disabled = true;
+                document.getElementById("stopBtn").disabled = false;
+                document.getElementById("status").textContent = "正在創作藝術...";
+                
+            } catch (error) {
+                console.error("藝術創作失敗:", error);
+                document.getElementById("status").textContent = "創作失敗，請重新調色盤";
+            }
+        }
+
+        async function loop() {
+            if (!isRunning) return;
+            webcam.update();
+            await predict();
+            window.requestAnimationFrame(loop);
+        }
+
+        async function predict() {
+            const prediction = await model.predict(webcam.canvas);
+            
+            // 排序預測結果
+            const sorted = prediction
+                .map((p, i) => ({...p, index: i}))
+                .sort((a, b) => b.probability - a.probability);
+            
+            // 更新顯示
+            const items = labelContainer.querySelectorAll('.prediction-item');
+            for (let i = 0; i < maxPredictions; i++) {
+                const item = items[i];
+                const pred = sorted[i];
+                const percentage = (pred.probability * 100).toFixed(1);
+                
+                // 更新標籤和數值
+                item.querySelector(".prediction-label").textContent = pred.className;
+                item.querySelector(".prediction-value").textContent = percentage + "%";
+                
+                // 更新進度條
+                const fill = item.querySelector(".prediction-fill");
+                fill.style.width = percentage + "%";
+                
+                // 設置顏色
+                fill.className = "prediction-fill";
+                if (i === 0) {
+                    fill.classList.add("fill-first");
+                    item.style.border = "2px solid #FF4500";
+                } else if (i === 1) {
+                    fill.classList.add("fill-second");
+                    item.style.border = "2px solid #FFD700";
+                } else {
+                    fill.classList.add("fill-other");
+                    item.style.border = "2px solid #4169E1";
+                }
+            }
+        }
+
+        function stopCamera() {
+            isRunning = false;
+            if (webcam) {
+                webcam.stop();
+            }
+            document.getElementById("webcam-container").innerHTML = "";
+            document.getElementById("label-container").style.display = "none";
+            document.getElementById("startBtn").disabled = false;
+            document.getElementById("stopBtn").disabled = true;
+            document.getElementById("status").textContent = "藝術創作已完成";
+        }
+    </script>
+</body>
+</html>
