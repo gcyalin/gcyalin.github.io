@@ -573,7 +573,7 @@ class ChatBot {
         const currentSessionHistory = chatHistory.filter(chat => chat.sessionId === this.sessionId);
         
         // 只載入最近的 10 條對話
-        const recentHistory = currentSessionHistory.slice(-10);
+        const recentHistory = currentSessionHistory.slice(0);
         
         recentHistory.forEach(chat => {
             this.addMessage(chat.userMessage, 'user');
