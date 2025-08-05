@@ -365,7 +365,7 @@ class ChatBot {
                     
                     <div class="chat-messages" id="chatMessages">
                         <div class="message system">
-                            歡迎使用 AI 助教！我可以回答您關於欒斌教授或AI課程的任何問題。
+                            歡迎使用 AI 助教！我可以回答您任何問題。
                         </div>
                     </div>
                     
@@ -583,7 +583,7 @@ class ChatBot {
         if (recentHistory.length === 0) {
             // 如果沒有歷史記錄，顯示歡迎訊息
             setTimeout(() => {
-                this.addMessage('你好，我是AI助教v4！有什麼關於欒斌教授或AI課程的問題想要問我嗎？', 'ai');
+                this.addMessage('你好，我是AI助教v4！有什麼問題想要問我嗎？', 'ai');
             }, 1000);
         }
     }
