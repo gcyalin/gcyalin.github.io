@@ -561,8 +561,8 @@ class ChatBot {
         });
         
         // 限制歷史記錄數量（最多保存 100 條）
-        if (chatHistory.length > 100) {
-            chatHistory.splice(0, chatHistory.length - 100);
+        if (chatHistory.length > 0) {
+            chatHistory.splice(0, chatHistory.length - 0);
         }
         
         localStorage.setItem('chatbot_history', JSON.stringify(chatHistory));
@@ -573,7 +573,7 @@ class ChatBot {
         const currentSessionHistory = chatHistory.filter(chat => chat.sessionId === this.sessionId);
         
         // 只載入最近的 10 條對話
-        const recentHistory = currentSessionHistory.slice(-10);
+        const recentHistory = currentSessionHistory.slice(0);
         
         recentHistory.forEach(chat => {
             this.addMessage(chat.userMessage, 'user');
